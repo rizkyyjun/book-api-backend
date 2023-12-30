@@ -19,4 +19,7 @@ Route::post('/login', [AuthenticationController::class, 'login']);
 
 Route::post('/register', [AuthenticationController::class, 'register']);
 
-Route::post('/logout', [AuthenticationController::class, 'logout'])->middleware('auth:sanctum');
+// Route::post('/logout', [AuthenticationController::class, 'logout'])->middleware('auth:sanctum');
+Route::middleware('auth:sanctum')->group(function (){
+    Route::post('/logout', [AuthenticationController::class, 'logout']);
+});
