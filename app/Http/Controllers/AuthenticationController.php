@@ -70,4 +70,9 @@ class AuthenticationController extends Controller
             'message' => 'logout success'
         ]);
     }
+
+    function index() {
+        $user = Auth::user();
+        return response()->json($user);
+    }
 }
