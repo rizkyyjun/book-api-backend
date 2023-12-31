@@ -9,9 +9,44 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * @OA\Info(
+ *     title="Basic Book API",
+ *     version="1.0.0",
+ *     description="API documentation for the Basic Book API",
+ *     @OA\Contact(
+ *         email="rizkyjuniastiar37@gmail.com",
+ *         name="Rizky Juniastiar"
+ *     ),
+ *     @OA\License(
+ *         name="MIT License",
+ *         url="https://opensource.org/licenses/MIT"
+ *     )
+ * )
+ */
 class AuthenticationController extends Controller
 {
 
+    /**
+     * @OA\Post(
+     *     path="/register",
+     *     tags={"Authentication"},
+     *     summary="User registration",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 @OA\Property(property="name", type="string"),
+     *                 @OA\Property(property="email", type="string", format="email"),
+     *                 @OA\Property(property="password", type="string", format="password"),
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response="201", description="Successfully registered"),
+     *     @OA\Response(response="422", description="Validation error"),
+     * )
+     */
     function register(Request $request) {
         $validator = Validator::make($request->all(), [
            'name' => 'required|string|max:255',
@@ -19,7 +54,6 @@ class AuthenticationController extends Controller
            'password' => 'required|string|min:8'
         ]);
 
-        // dd($validator->errors());
         if ($validator->fails())
         {
             return response()->json($validator->errors());
@@ -40,6 +74,25 @@ class AuthenticationController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/login",
+     *     tags={"Authentication"},
+     *     summary="User login",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 @OA\Property(property="email", type="string", format="email"),
+     *                 @OA\Property(property="password", type="string", format="password"),
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response="200", description="Successfully logged in"),
+     *     @OA\Response(response="401", description="Invalid credentials"),
+     * )
+     */
     function login(Request $request) {
         $request->validate([
             'email'=>'required|email',
@@ -64,6 +117,15 @@ class AuthenticationController extends Controller
         ]);
     }    
 
+    /**
+     * @OA\Post(
+     *     path="/logout",
+     *     tags={"Authentication"},
+     *     summary="User logout",
+     *     security={{ "sanctum": {} }},
+     *     @OA\Response(response="200", description="Successfully logged out"),
+     * )
+     */
     function logout() {
         Auth::user()->tokens()->delete();
         return response()->json([
@@ -71,6 +133,16 @@ class AuthenticationController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/user",
+     *     tags={"User"},
+     *     summary="Get authenticated user details",
+     *     security={{ "sanctum": {} }},
+     *     @OA\Response(response="200", description="User details"),
+     *     @OA\Response(response="401", description="Unauthenticated"),
+     * )
+     */
     function index() {
         $user = Auth::user();
         return response()->json($user);
